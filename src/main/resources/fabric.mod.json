@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "ingamescreentime",
+	"version": "${version}",
+	"name": "ingamescreentime",
+	"description": "Fixing InventoryScreen LivingEntity rendering since 2020.",
+	"authors": [
+		"vini2003"
+	],
+	"contact": {
+		"sources": "https://github.com/vini2003/ingamescreentime"
+	},
+	"license": "GPLv3",
+	"icon": "assets/ingamescreentime/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+		],
+		"client": [
+			"ingamescreentime.InGameScreenTimeClient"
+		]
+	},
+	"mixins": [
+	],
+	"depends": {
+		"fabricloader": ">=0.7.2"
+	},
+	"suggests": {
+		"flamingo": "*"
+	}
+}
