@@ -1,35 +1,54 @@
 package ingamescreentime;
 
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.World;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 public class CallbackRegistry {
+    public static final float DAY = 24000.0F;
+    public static final float HOUR = 1000.0F;
+    public static final float MINUTE = 16.66F;
+
+    public static final String DATE_KEY = "text.ingamescreentime.date";
+    public static final String TIME_KEY = "text.ingamescreentime.time";
+    public static final String BIOME_KEY = "text.ingamescreentime.biome";
+
     public static void initialize() {
         ClientTickCallback.EVENT.register(tick -> {
             World world = tick.world;
-            if (world != null) {
-                long time = world.getTime();
-                long timeOfDay = world.getTimeOfDay();
-                boolean AM = true;
-                long hours = timeOfDay / 1000;
-                long minutes = timeOfDay % 1000;
-                if (hours >= 24) {
-                    hours = hours % 24;
-                }
-                long hour;
-                if (hours + 6 > 12) {
-                    hour = hours + 6 - 12;
-                    AM = false;
+            PlayerEntity player = tick.player;
+
+            if (world != null && player != null) {
+                long time = (long) (world.getTime() / DAY) + 1;
+
+                long timeOfDay = (long) (world.getTimeOfDay() % DAY);
+
+                long hour = (long) (timeOfDay / HOUR);
+                long minute = (long) ((timeOfDay % HOUR) / MINUTE);
+
+                boolean mode;
+
+                final boolean AM = false;
+                final boolean PM = true;
+
+                if (hour + 6 > 12 && hour + 6 < 24) {
+                    mode = PM;
+                    hour = Math.max(1, hour + 6 - 12);
+                } else if (hour + 6 == 24) {
+                    mode = AM;
+                    hour = 0;
+                } else if (hour + 6 == 12) {
+                    mode = PM;
+                    hour = 12;
                 } else {
-                    hour = hours + 6;
+                    mode = AM;
+                    hour = hour + 6;
                 }
-                long minute = minutes / 60;
-                ScreenRegistry.INFO_TEXT_DATE.setText(new TranslatableText("text.ingamescreentime.date").append(": ").append(String.valueOf(time / 24000)));
-                ScreenRegistry.INFO_TEXT_TIME.setText(new TranslatableText("text.ingamescreentime.time").append(": ").append(hour + ":" + (minute > 9 ? minute : "0" + minute) + (AM ? " AM" : " PM")));
+
+                ScreenRegistry.INFO_TEXT_DATE.setText(new TranslatableText(DATE_KEY).append(": " + time));
+                ScreenRegistry.INFO_TEXT_TIME.setText(new TranslatableText(TIME_KEY).append(": " + hour + ":" + (minute > 9 ? minute : "0" + minute) + (!mode ? "AM" : "PM")));
+                ScreenRegistry.INFO_TEXT_BIOME.setText(new TranslatableText(BIOME_KEY).append(": " + world.getBiome(player.getBlockPos()).getName().asFormattedString()));
             }
         });
     }
