@@ -37,17 +37,20 @@ public class CallbackRegistry {
                     hour = Math.max(1, hour + 6 - 12);
                 } else if (hour + 6 == 24) {
                     mode = AM;
-                    hour = 0;
+                    hour = 12;
                 } else if (hour + 6 == 12) {
                     mode = PM;
                     hour = 12;
+                } else if (hour > 18) {
+                    mode = AM;
+                    hour = hour - 18;
                 } else {
                     mode = AM;
                     hour = hour + 6;
                 }
 
                 ScreenRegistry.INFO_TEXT_DATE.setText(new TranslatableText(DATE_KEY).append(": " + time));
-                ScreenRegistry.INFO_TEXT_TIME.setText(new TranslatableText(TIME_KEY).append(": " + hour + ":" + (minute > 9 ? minute : "0" + minute) + (!mode ? "AM" : "PM")));
+                ScreenRegistry.INFO_TEXT_TIME.setText(new TranslatableText(TIME_KEY).append(": " + hour + ":" + (minute > 9 ? minute : "0" + minute) + (!mode ? " AM" : " PM")));
                 ScreenRegistry.INFO_TEXT_BIOME.setText(new TranslatableText(BIOME_KEY).append(": " + world.getBiome(player.getBlockPos()).getName().asFormattedString()));
             }
         });
